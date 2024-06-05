@@ -4,7 +4,7 @@ import pandas as pd
 
 def crawl_and_save_iidex_data(url):
 # 指定されたURL
-    url = "http://ereter.net/iidxplayerdata/16548190/level/12/"
+    url = "http://ereter.net/iidxplayerdata/16548190"
     
     # ページの内容を取得
     response = requests.get(url)

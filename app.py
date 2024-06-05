@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import streamlit as st
+from data_cloling import crawl_and_save_iidex_data
 
 def crawl_iidx_data(url):
     # ページの内容を取得
@@ -41,7 +42,7 @@ st.title('IIDX Player Data')
 url = st.text_input('Enter the URL of IIDX player data:', 'http://ereter.net/iidxplayerdata/16548190/')
 
 if st.button('Fetch Data'):
-    df = crawl_iidx_data(url)
+    df = crawl_and_save_iidex_data(url)
     st.dataframe(df)
 
 # このコードを実行するには、ターミナルで以下のコマンドを実行します：
