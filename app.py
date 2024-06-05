@@ -3,7 +3,7 @@ from data_cloling import crawl_and_save_iidex_data
 import pandas as pd
 
 # Streamlitアプリの設定
-st.title('IIDX Player Data')
+st.title('IIDX DP Homework確認用ツール')
 
 #iidx_id_me = st.text_input('自分のIIDX IDを入れてください:', '16548190')
 #
@@ -71,5 +71,10 @@ if 'df_me' in st.session_state and 'df_rival1' in st.session_state:
         'vsRival3': df_me['Details_Number'] - df_rival3['Details_Number'],
     }).fillna(0)  # データの数が一致しない場合は0で埋める
 
-    st.subheader('Details_Numberの比較')
+
+    st.subheader('ライバルスコアとの比較')
+    # フィルタリングチェックボックス
+    filter_checkbox = st.checkbox('全員が未プレイの曲を除外')
+    if filter_checkbox:
+        comparison = comparison[(comparison['Me'] != 0) | (comparison['Rival1'] != 0) | (comparison['Rival2'] != 0) | (comparison['Rival3'] != 0)]
     st.dataframe(comparison)
