@@ -39,10 +39,10 @@ def crawl_iidx_data(url):
 # Streamlitアプリの設定
 st.title('IIDX Player Data')
 
-url = st.text_input('Enter the URL of IIDX player data:', 'http://ereter.net/iidxplayerdata/16548190/')
+iidx_id = st.text_input('Enter the URL of IIDX player data:', '16548190')
 
 if st.button('Fetch Data'):
-    df = crawl_and_save_iidex_data(url)
+    df = crawl_and_save_iidex_data(iidx_id)
     st.dataframe(df)
 
 # このコードを実行するには、ターミナルで以下のコマンドを実行します：
