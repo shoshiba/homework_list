@@ -4,17 +4,12 @@ import pandas as pd
 
 def crawl_and_save_iidex_data(url):
 # 指定されたURL
-    url = "http://ereter.net/iidxplayerdata/16548190"
-    
     # ページの内容を取得
     response = requests.get(url)
     soup = BeautifulSoup(response.content, "html.parser")
     
     
     table = soup.find("table",class_="table condensed")
-    
-    print(table.prettify())
-    
     
     # テーブルデータをリストに変換
     rows = table.find_all("tr")
@@ -27,7 +22,7 @@ def crawl_and_save_iidex_data(url):
             data.append(cols)
     
     # カラム名を定義（必要に応じて適切な名前を付ける）
-    column_names = ["Level", "Song", "Score", "Details", "Performance", "Difficulty"]
+    column_names = ["Level", "Rank", "Score", "Details", "Performance", "Difficulty"]
     
     # Pandas DataFrameに変換
     df = pd.DataFrame(data, columns=column_names)
@@ -40,7 +35,7 @@ def crawl_and_save_iidex_data(url):
     df.drop(columns=["Details"], inplace=True)
     
     # データフレームを表示
-    print(df)
+    return df
     
     # CSVファイルとして保存
     df.to_csv("iidx_player_data.csv", index=False, encoding="utf-8")
