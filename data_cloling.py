@@ -38,7 +38,7 @@ def crawl_and_save_iidex_data(iidx_id):
     
     # "Details" カラムから数値を抽出し、新しいカラムとして追加
     df["Details"] = df["Details"].replace("", "0")
-    df["Details_Number"] = df["Details"].str.extract(r'(\d+)').astype(int)
+    df["Details_Number"] = df["Details"].str.extract(r'(\d+)').fillna(0).astype(int)
     
     # 不要なカラムがあれば削除（例として "Details" カラムを削除）
     df.drop(columns=["Details"], inplace=True)
