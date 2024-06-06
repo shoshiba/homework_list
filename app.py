@@ -164,11 +164,6 @@ if all(f'df_{key}' in st.session_state for key in iidx_ids.keys()):
     
     st.subheader('ライバルスコアとの比較')
 
-    # 条件付きスタイルの適用
-    def highlight_rank(row):
-        return ['background-color: yellow' if row['Rank'] != 1 else '' for _ in row]
-
-    styled_comparison = comparison.style.apply(highlight_rank, axis=1)
 
     # フィルタリングされたデータフレームを表示
-    st.dataframe(styled_comparison)
+    st.dataframe(comparison)
