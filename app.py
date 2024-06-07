@@ -41,6 +41,7 @@ if all(f'df_{key}' in st.session_state for key in iidx_ids.keys()):
     levels = sorted(dfs['me']['Level'].unique(), key=lambda x: int(x.lstrip('☆')))
     difficulty_order = ['NORMAL', 'HYPER', 'ANOTHER', 'LEGGENDARIA']
     difficulties = sorted(comparison['Difficulty'].unique(), key=lambda x: difficulty_order.index(x))
+    ranks = sorted(comparison['Rank'].unique())
 
     # 状態を保持するためのチェックボックスの初期値を設定
     if 'selected_levels' not in st.session_state:
@@ -49,9 +50,16 @@ if all(f'df_{key}' in st.session_state for key in iidx_ids.keys()):
     if 'selected_difficulty' not in st.session_state:
         st.session_state.selected_difficulty = {difficulty: True for difficulty in difficulties}
 
+    if 'selected_rank' not in st.session_state:
+        st.session_state.selected_rank = {str(rank): True for rank in ranks}
+
     def set_all_checkboxes_dif(value):
         """全てのチェックボックスを設定する"""
         st.session_state.selected_difficulty = {difficulty: value for difficulty in difficulties}
+
+    def set_all_checkboxes_ranks(value):
+        """全てのチェックボックスを設定する"""
+        st.session_state.selected_rank = {str(rank): value for rank in ranks}
 
     def set_all_checkboxes(value):
         """全てのチェックボックスを設定する"""
@@ -65,15 +73,13 @@ if all(f'df_{key}' in st.session_state for key in iidx_ids.keys()):
 
     # チェックボックスの表示（横一列）
     selected_levels = []
-    checkboxes = st.container()
-    with checkboxes:
-        with st.container():
-            st.markdown('<div class="checkbox-container">', unsafe_allow_html=True)
-            st.columns(len(levels))
-            for level in levels:
-                if st.checkbox(level, value=st.session_state.selected_levels[level], key=f'level_{level}'):
-                    selected_levels.append(level)
-            st.markdown('</div>', unsafe_allow_html=True)
+    with st.container():
+        st.markdown('<div class="checkbox-container">', unsafe_allow_html=True)
+        cols = st.columns(len(levels))
+        for i, level in enumerate(levels):
+            if cols[i].checkbox(level, value=st.session_state.selected_levels[level], key=f'level_{level}'):
+                selected_levels.append(level)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # フィルタリング適用
     comparison = comparison[comparison['Level'].isin(selected_levels)]
@@ -89,8 +95,7 @@ if all(f'df_{key}' in st.session_state for key in iidx_ids.keys()):
 
     # チェックボックスの表示（横一列）
     selected_difficulties = []
-    checkboxes = st.container()
-    with checkboxes:
+    with st.container():
         cols = st.columns(len(difficulties))
         for col, difficulty in zip(cols, difficulties):
             if col.checkbox(difficulty, value=st.session_state.selected_difficulty[difficulty], key=difficulty):
@@ -98,6 +103,29 @@ if all(f'df_{key}' in st.session_state for key in iidx_ids.keys()):
 
     # フィルタリング適用
     comparison = comparison[comparison['Difficulty'].isin(selected_difficulties)]
+
+    # 順位別フィルター
+    st.write('順位別フィルター')
+
+    # ボタンの追加
+    if st.button('全部チェックを入れる3'):
+        set_all_checkboxes_ranks(True)
+    if st.button('全部チェックを外す3'):
+        set_all_checkboxes_ranks(False)
+
+    # チェックボックスの表示（横一列）
+    selected_ranks = []
+    with st.container():
+        cols = st.columns(len(ranks))
+        for col, rank in zip(cols, ranks):
+            rank_str = str(rank)  # rankを文字列に変換
+            if rank_str not in st.session_state.selected_rank:
+                st.session_state.selected_rank[rank_str] = True
+            if col.checkbox(rank_str, value=st.session_state.selected_rank[rank_str], key=rank_str):
+                selected_ranks.append(rank)
+
+    # フィルタリング適用
+    comparison = comparison[comparison['Rank'].isin(selected_ranks)]
 
     # 未プレイ曲に関する除外
     st.write('未プレイフィルター')
