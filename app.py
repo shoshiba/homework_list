@@ -133,6 +133,12 @@ if all(f'df_{key}' in st.session_state for key in iidx_ids.keys()):
         comparison = comparison[(comparison['Me'] != 0) | (comparison['Rival1'] != 0) | (comparison['Rival2'] != 0) | (comparison['Rival3'] != 0)]
     if st.checkbox('自分が未プレイの曲を除外'):
         comparison = comparison[(comparison['Me'] != 0)]
+    if st.checkbox('Rival1が未プレイの曲を除外'):
+        comparison = comparison[(comparison['Rival1'] != 0)]
+    if st.checkbox('Rival2が未プレイの曲を除外'):
+        comparison = comparison[(comparison['Rival2'] != 0)]
+    if st.checkbox('Rival3が未プレイの曲を除外'):
+        comparison = comparison[(comparison['Rival3'] != 0)]
 
     st.subheader('ライバルスコアとの比較')
 
