@@ -6,10 +6,10 @@ st.title('IIDX DP Homework確認用ツール')
 
 # IIDX ID入力
 iidx_ids = {
-    'me': st.text_input('自分のIIDX IDを入れてください:', '16548190'),
-    'rival1': st.text_input('比較したい人のIIDX IDを入れてください1:', '55344136'),
-    'rival2': st.text_input('比較したい人のIIDX IDを入れてください2:', '42936531'),
-    'rival3': st.text_input('比較したい人のIIDX IDを入れてください3:', '48537824')
+    'me': st.text_input('自分のIIDX IDを入れてください:', ''),
+    'rival1': st.text_input('比較したい人のIIDX IDを入れてください1:', ''),
+    'rival2': st.text_input('比較したい人のIIDX IDを入れてください2:', ''),
+    'rival3': st.text_input('比較したい人のIIDX IDを入れてください3:', '')
 }
 
 # スコアデータの取得
