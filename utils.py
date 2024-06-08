@@ -11,9 +11,9 @@ def extract_percentage(performance):
     match = re.search(r'(\d+\.\d+%)', performance)
     return match.group(1) if match else '0.0%'
 
-def calculate_rank(row):
+def calculate_rank(row, num_rivals):
     """スコアに基づいて順位を計算する"""
-    scores = [row['Me'], row['Rival1'], row['Rival2'], row['Rival3']]
+    scores = [row['Me']] + [row[f'Rival{i}'] for i in range(1, num_rivals + 1)]
     return sorted(scores, reverse=True).index(row['Me']) + 1
 
 def extract_title_and_difficulty(title):
@@ -23,20 +23,21 @@ def extract_title_and_difficulty(title):
         return match.group(1), match.group(2)
     return title, ''
 
-def create_comparison_dataframe(dfs):
+def create_comparison_dataframe(dfs, num_rivals):
     """比較用のデータフレームを作成する"""
-    comparison = pd.DataFrame({
+    comparison_data = {
         'Level': dfs['me']['Level'],
         'Title': dfs['me']['Title'],
         'Me': dfs['me']['Details_Number'],
         'MePer': dfs['me']['Performance'],
-        'Rival1': dfs['rival1']['Details_Number'],
-        'Rival2': dfs['rival2']['Details_Number'],
-        'Rival3': dfs['rival3']['Details_Number'],
-        'vsRival1': dfs['me']['Details_Number'] - dfs['rival1']['Details_Number'],
-        'vsRival2': dfs['me']['Details_Number'] - dfs['rival2']['Details_Number'],
-        'vsRival3': dfs['me']['Details_Number'] - dfs['rival3']['Details_Number'],
-    }).fillna(0)
+    }
+
+    for i in range(1, num_rivals + 1):
+        key = f'rival{i}'
+        comparison_data[f'Rival{i}'] = dfs[key]['Details_Number']
+        comparison_data[f'vsRival{i}'] = dfs['me']['Details_Number'] - dfs[key]['Details_Number']
+    
+    comparison = pd.DataFrame(comparison_data).fillna(0)
 
     # 楽曲名と難易度を抽出して新しいカラムを作成
     comparison[['Song_Title', 'Difficulty']] = comparison.apply(
@@ -44,6 +45,11 @@ def create_comparison_dataframe(dfs):
         axis=1
     )
 
-    comparison['Rank'] = comparison.apply(calculate_rank, axis=1)
+    comparison['Rank'] = comparison.apply(lambda row: calculate_rank(row, num_rivals), axis=1)
     comparison['Me_Per'] = comparison['MePer'].apply(extract_percentage)
-    return comparison[['Level', 'Song_Title', 'Difficulty', 'Rank', 'Me', 'Me_Per', 'Rival1', 'Rival2', 'Rival3', 'vsRival1', 'vsRival2', 'vsRival3']]
+
+    columns = ['Level', 'Song_Title', 'Difficulty', 'Rank', 'Me', 'Me_Per']
+    columns += [f'Rival{i}' for i in range(1, num_rivals + 1)]
+    columns += [f'vsRival{i}' for i in range(1, num_rivals + 1)]
+    
+    return comparison[columns]

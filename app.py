@@ -2,28 +2,35 @@ import streamlit as st
 import pandas as pd
 from utils import fetch_data, create_comparison_dataframe
 
+# 定数の定義
+DIFFICULTY_ORDER = ['NORMAL', 'HYPER', 'ANOTHER', 'LEGGENDARIA']
+
+# タイトルの設定
 st.title('IIDX DP Homework確認用ツール')
 
-# IIDX ID入力
-iidx_ids = {
-    'me': st.text_input('自分のIIDX IDを入れてください:', ''),
-    'rival1': st.text_input('比較したい人のIIDX IDを入れてください1:', ''),
-    'rival2': st.text_input('比較したい人のIIDX IDを入れてください2:', ''),
-    'rival3': st.text_input('比較したい人のIIDX IDを入れてください3:', '')
-}
+# 自分のIIDX ID入力
+iidx_id_me = st.text_input('自分のIIDX IDを入れてください:', '')
+
+# ライバルの人数選択
+num_rivals = st.selectbox('ライバルの人数を選択してください:', [1, 2, 3, 4])
+
+# ライバルのIIDX ID入力
+iidx_ids = {'me': iidx_id_me}
+for i in range(1, num_rivals + 1):
+    iidx_ids[f'rival{i}'] = st.text_input(f'比較したい人のIIDX IDを入れてください{i}:')
 
 # スコアデータの取得
 if st.button('Fetch Score Data'):
-    dfs = {key: fetch_data(iidx_id) for key, iidx_id in iidx_ids.items()}
+    dfs = {key: fetch_data(iidx_id) for key, iidx_id in iidx_ids.items() if iidx_id}
     for key, df in dfs.items():
         st.session_state[f'df_{key}'] = df
 
-# 比較データの表示
+# データが存在する場合の処理
 if all(f'df_{key}' in st.session_state for key in iidx_ids.keys()):
     dfs = {key: st.session_state[f'df_{key}'] for key in iidx_ids.keys()}
-    comparison = create_comparison_dataframe(dfs)
+    comparison = create_comparison_dataframe(dfs, num_rivals)
 
-    # CSSスタイルを追加してチェックボックスを横一列に並べる
+    # CSSスタイルの追加
     st.markdown("""
         <style>
         .checkbox-container {
@@ -36,48 +43,38 @@ if all(f'df_{key}' in st.session_state for key in iidx_ids.keys()):
         </style>
         """, unsafe_allow_html=True)
 
-    # レベル別フィルター
+    # レベル別フィルターの初期化
     st.write('レベル別フィルター')
     levels = sorted(dfs['me']['Level'].unique(), key=lambda x: int(x.lstrip('☆')))
-    difficulty_order = ['NORMAL', 'HYPER', 'ANOTHER', 'LEGGENDARIA']
-    difficulties = sorted(comparison['Difficulty'].unique(), key=lambda x: difficulty_order.index(x))
-    ranks = sorted(comparison['Rank'].unique())
-
-    # 状態を保持するためのチェックボックスの初期値を設定
     if 'selected_levels' not in st.session_state:
         st.session_state.selected_levels = {level: True for level in levels}
 
+    # 譜面難易度別フィルターの初期化
+    difficulties = sorted(comparison['Difficulty'].unique(), key=lambda x: DIFFICULTY_ORDER.index(x))
     if 'selected_difficulty' not in st.session_state:
         st.session_state.selected_difficulty = {difficulty: True for difficulty in difficulties}
 
+    # 順位別フィルターの初期化
+    ranks = sorted(comparison['Rank'].unique())
     if 'selected_rank' not in st.session_state:
         st.session_state.selected_rank = {str(rank): True for rank in ranks}
 
-    def set_all_checkboxes_dif(value):
-        """全てのチェックボックスを設定する"""
-        st.session_state.selected_difficulty = {difficulty: value for difficulty in difficulties}
-
-    def set_all_checkboxes_ranks(value):
-        """全てのチェックボックスを設定する"""
-        st.session_state.selected_rank = {str(rank): value for rank in ranks}
-
-    def set_all_checkboxes(value):
-        """全てのチェックボックスを設定する"""
-        st.session_state.selected_levels = {level: value for level in levels}
+    # 全チェック/全解除関数の定義
+    def set_all_checkboxes(key, items, value):
+        st.session_state[key] = {item: value for item in items}
 
     # ボタンの追加
     if st.button('全部チェックを入れる'):
-        set_all_checkboxes(True)
+        set_all_checkboxes('selected_levels', levels, True)
     if st.button('全部チェックを外す'):
-        set_all_checkboxes(False)
+        set_all_checkboxes('selected_levels', levels, False)
 
     # チェックボックスの表示（横一列）
     selected_levels = []
     with st.container():
         st.markdown('<div class="checkbox-container">', unsafe_allow_html=True)
-        cols = st.columns(len(levels))
-        for i, level in enumerate(levels):
-            if cols[i].checkbox(level, value=st.session_state.selected_levels[level], key=f'level_{level}'):
+        for level in levels:
+            if st.checkbox(level, value=st.session_state.selected_levels[level], key=f'level_{level}'):
                 selected_levels.append(level)
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -86,43 +83,41 @@ if all(f'df_{key}' in st.session_state for key in iidx_ids.keys()):
 
     # 譜面難易度別フィルター
     st.write('譜面難易度別フィルター')
-
-    # ボタンの追加
     if st.button('全部チェックを入れる2'):
-        set_all_checkboxes_dif(True)
+        set_all_checkboxes('selected_difficulty', difficulties, True)
     if st.button('全部チェックを外す2'):
-        set_all_checkboxes_dif(False)
+        set_all_checkboxes('selected_difficulty', difficulties, False)
 
     # チェックボックスの表示（横一列）
     selected_difficulties = []
     with st.container():
-        cols = st.columns(len(difficulties))
-        for col, difficulty in zip(cols, difficulties):
-            if col.checkbox(difficulty, value=st.session_state.selected_difficulty[difficulty], key=difficulty):
+        st.markdown('<div class="checkbox-container">', unsafe_allow_html=True)
+        for difficulty in difficulties:
+            if st.checkbox(difficulty, value=st.session_state.selected_difficulty[difficulty], key=difficulty):
                 selected_difficulties.append(difficulty)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # フィルタリング適用
     comparison = comparison[comparison['Difficulty'].isin(selected_difficulties)]
 
     # 順位別フィルター
     st.write('順位別フィルター')
-
-    # ボタンの追加
     if st.button('全部チェックを入れる3'):
-        set_all_checkboxes_ranks(True)
+        set_all_checkboxes('selected_rank', ranks, True)
     if st.button('全部チェックを外す3'):
-        set_all_checkboxes_ranks(False)
+        set_all_checkboxes('selected_rank', ranks, False)
 
     # チェックボックスの表示（横一列）
     selected_ranks = []
     with st.container():
-        cols = st.columns(len(ranks))
-        for col, rank in zip(cols, ranks):
-            rank_str = str(rank)  # rankを文字列に変換
+        st.markdown('<div class="checkbox-container">', unsafe_allow_html=True)
+        for rank in ranks:
+            rank_str = str(rank)
             if rank_str not in st.session_state.selected_rank:
                 st.session_state.selected_rank[rank_str] = True
-            if col.checkbox(rank_str, value=st.session_state.selected_rank[rank_str], key=rank_str):
+            if st.checkbox(rank_str, value=st.session_state.selected_rank[rank_str], key=rank_str):
                 selected_ranks.append(rank)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # フィルタリング適用
     comparison = comparison[comparison['Rank'].isin(selected_ranks)]
@@ -130,15 +125,16 @@ if all(f'df_{key}' in st.session_state for key in iidx_ids.keys()):
     # 未プレイ曲に関する除外
     st.write('未プレイフィルター')
     if st.checkbox('全員が未プレイの曲を除外'):
-        comparison = comparison[(comparison['Me'] != 0) | (comparison['Rival1'] != 0) | (comparison['Rival2'] != 0) | (comparison['Rival3'] != 0)]
+        condition = (comparison['Me'] != 0)
+        for i in range(1, num_rivals + 1):
+            condition |= (comparison[f'Rival{i}'] != 0)
+        comparison = comparison[condition]
     if st.checkbox('自分が未プレイの曲を除外'):
         comparison = comparison[(comparison['Me'] != 0)]
-    if st.checkbox('Rival1が未プレイの曲を除外'):
-        comparison = comparison[(comparison['Rival1'] != 0)]
-    if st.checkbox('Rival2が未プレイの曲を除外'):
-        comparison = comparison[(comparison['Rival2'] != 0)]
-    if st.checkbox('Rival3が未プレイの曲を除外'):
-        comparison = comparison[(comparison['Rival3'] != 0)]
+
+    for i in range(1, num_rivals + 1):
+        if st.checkbox(f'Rival{i}が未プレイの曲を除外'):
+            comparison = comparison[(comparison[f'Rival{i}'] != 0)]
 
     st.subheader('ライバルスコアとの比較')
 
