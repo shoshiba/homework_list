@@ -15,7 +15,7 @@ def is_valid_iidx_id(iidx_id):
 iidx_id_me = st.text_input('自分のIIDX IDを入れてください:', '')
 
 # ライバルの人数選択
-num_rivals = st.selectbox('ライバルの人数を選択してください:', [1, 2, 3, 4])
+num_rivals = st.selectbox('ライバルの人数を選択してください:', [0, 1, 2, 3, 4])
 
 # ライバルのIIDX ID入力
 iidx_ids = {'me': iidx_id_me}
