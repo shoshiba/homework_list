@@ -8,6 +8,9 @@ DIFFICULTY_ORDER = ['NORMAL', 'HYPER', 'ANOTHER', 'LEGGENDARIA']
 # タイトルの設定
 st.title('IIDX DP Homework確認用ツール')
 
+def is_valid_iidx_id(iidx_id):
+    return iidx_id.isdigit() and len(iidx_id) == 8
+
 # 自分のIIDX ID入力
 iidx_id_me = st.text_input('自分のIIDX IDを入れてください:', '')
 
@@ -19,11 +22,33 @@ iidx_ids = {'me': iidx_id_me}
 for i in range(1, num_rivals + 1):
     iidx_ids[f'rival{i}'] = st.text_input(f'比較したい人のIIDX IDを入れてください{i}:')
 
-# スコアデータの取得
-if st.button('Fetch Score Data'):
-    dfs = {key: fetch_data(iidx_id) for key, iidx_id in iidx_ids.items() if iidx_id}
-    for key, df in dfs.items():
-        st.session_state[f'df_{key}'] = df
+# エラーメッセージ表示用
+errors = []
+
+
+# 入力検証
+if st.button('Fetch Score Data', key='fetch_data'):
+    valid = True
+    if not is_valid_iidx_id(iidx_id_me):
+        errors.append('自分のIIDX IDは8桁の数字でなければなりません。')
+        valid = False
+    
+    for i in range(1, num_rivals + 1):
+        if not is_valid_iidx_id(iidx_ids[f'rival{i}']):
+            errors.append(f'比較したい人のIIDX ID {i} は8桁の数字でなければなりません。')
+            valid = False
+
+    if valid:
+        progress_bar = st.progress(0)
+        dfs = {}
+        for i, (key, iidx_id) in enumerate(iidx_ids.items(), start=1):
+            if iidx_id:
+                dfs[key] = fetch_data(iidx_id)
+                st.session_state[f'df_{key}'] = dfs[key]
+            progress_bar.progress(i / len(iidx_ids))
+    else:
+        for error in errors:
+            st.error(error)
 
 # データが存在する場合の処理
 if all(f'df_{key}' in st.session_state for key in iidx_ids.keys()):
