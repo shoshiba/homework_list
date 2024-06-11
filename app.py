@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from utils import fetch_data, create_comparison_dataframe
-from validation import is_valid_iidx_id, validate_inputs
+from validation import validate_inputs
 from filters import apply_filters
 
 # 定数の定義
