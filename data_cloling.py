@@ -12,10 +12,16 @@ def crawl_iidx_data(iidx_id):
     for i in range(1, 13):
         url = f"{base_url}/{i}"
         response = requests.get(url)
-        response.raise_for_status()
+        if response.status_code != 200:
+            print(f"Failed to retrieve data from {url}")
+            continue
         soup = BeautifulSoup(response.content, "html.parser")
         
         table = soup.find("table", class_="table condensed")
+        if not table:
+            print(f"No table found on page {url}")
+            continue
+        
         rows = table.find_all("tr")
 
         for row in rows:
@@ -39,7 +45,7 @@ def create_iidx_dataframe(data):
 
     return df
 
-def crawl_and_save_iidex_data(iidx_id):
+def crawl_and_save_iidx_data(iidx_id):
     """
     IIDX IDに基づいてデータをクローリングし、Datatableを作成して返す
     """

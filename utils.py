@@ -1,10 +1,10 @@
 import re
 import pandas as pd
-from data_cloling import crawl_and_save_iidex_data
+from data_cloling import crawl_and_save_iidx_data
 
 def fetch_data(iidx_id):
     """指定されたIIDX IDのデータを取得する"""
-    return crawl_and_save_iidex_data(iidx_id)
+    return crawl_and_save_iidx_data(iidx_id)
 
 def extract_percentage(performance):
     """Performanceからパーセンテージを抽出"""
