@@ -1,5 +1,4 @@
 import streamlit as st
-import pandas as pd
 from utils import fetch_data, create_comparison_dataframe
 from validation import validate_inputs
 from filters import apply_filters
@@ -39,7 +38,7 @@ if st.button('Fetch Score Data', key='fetch_data'):
                     dfs[key] = df
                     st.session_state[f'df_{key}'] = dfs[key]
             progress_bar.progress(i / len(iidx_ids))
-        
+
         if errors:
             for error in errors:
                 st.error(error)
@@ -50,7 +49,9 @@ if st.button('Fetch Score Data', key='fetch_data'):
 
 # データが存在する場合の処理
 if 'df_me' in st.session_state:
-    dfs = {key: st.session_state[f'df_{key}'] for key in iidx_ids.keys() if f'df_{key}' in st.session_state}
+    dfs = {key: st.session_state[f'df_{key}']
+           for key in iidx_ids.keys()
+           if f'df_{key}' in st.session_state}
     if dfs:
         comparison = create_comparison_dataframe(dfs, num_rivals)
 

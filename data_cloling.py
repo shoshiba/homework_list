@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 
+
 def crawl_iidx_data(iidx_id):
     """
     指定されたIIDX IDのデータをクローリングして返す
@@ -16,12 +17,10 @@ def crawl_iidx_data(iidx_id):
             print(f"Failed to retrieve data from {url}")
             continue
         soup = BeautifulSoup(response.content, "html.parser")
-        
         table = soup.find("table", class_="table condensed")
         if not table:
             print(f"No table found on page {url}")
             continue
-        
         rows = table.find_all("tr")
 
         for row in rows:
@@ -32,18 +31,22 @@ def crawl_iidx_data(iidx_id):
 
     return data
 
+
 def create_iidx_dataframe(data):
     """
     クローリングされたデータからDatatableを作成して返す
     """
-    column_names = ["Level", "Title", "Rank", "Details", "Performance", "Difficulty"]
+    column_names = ["Level", "Title", "Rank", "Details", "Performance",
+                    "Difficulty"]
     df = pd.DataFrame(data, columns=column_names)
-    
     df["Details"] = df["Details"].replace("", "0")
-    df["Details_Number"] = df["Details"].str.extract(r'(\d+)').fillna(0).astype(int)
+    df["Details_Number"] = df["Details"].str.extract(r'(\d+)') \
+                                        .fillna(0) \
+                                        .astype(int)
     df.drop(columns=["Details"], inplace=True)
 
     return df
+
 
 def crawl_and_save_iidx_data(iidx_id):
     """

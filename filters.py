@@ -2,10 +2,11 @@ import streamlit as st
 
 DIFFICULTY_ORDER = ['NORMAL', 'HYPER', 'ANOTHER', 'LEGGENDARIA']
 
+
 def apply_filters(comparison, dfs, num_rivals):
     with st.sidebar:
         st.header('フィルター設定')
-        
+
         # レベル別フィルターの初期化
         st.write('レベル別フィルター')
         levels = sorted(dfs['me']['Level'].unique(), key=lambda x: int(x.lstrip('☆')))
