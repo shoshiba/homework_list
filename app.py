@@ -23,7 +23,9 @@ num_rivals = st.selectbox("ライバルの人数を選択してください:", [
 # ライバルのIIDX ID入力
 iidx_ids = {"me": iidx_id_me}
 for i in range(1, num_rivals + 1):
-    iidx_ids[f"rival{i}"] = st.text_input(f"比較したい人のIIDX IDを入れてください{i}:")
+    iidx_ids[f"rival{i}"] = st.text_input(
+        f"比較したい人のIIDX IDを入れてください{i}:"
+    )
 
 # エラーメッセージ表示用
 errors = []
@@ -38,7 +40,9 @@ if st.button("Fetch Score Data", key="fetch_data"):
             if iidx_id:
                 df = fetch_data(iidx_id)
                 if df.empty:
-                    errors.append(f"ID: {iidx_id} は存在しない可能性があります。")
+                    errors.append(
+                        f"ID: {iidx_id} は存在しない可能性があります。"
+                    )
                 else:
                     dfs[key] = df
                     st.session_state[f"df_{key}"] = dfs[key]

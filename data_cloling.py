@@ -36,10 +36,19 @@ def crawl_iidx_data(iidx_id: str) -> str:
 
 def create_iidx_dataframe(data: list) -> pd.DataTable:
     """クローリングされたデータからDatatableを作成して返す"""
-    column_names = ["Level", "Title", "Rank", "Details", "Performance", "Difficulty"]
+    column_names = [
+        "Level",
+        "Title",
+        "Rank",
+        "Details",
+        "Performance",
+        "Difficulty",
+    ]
     df = pd.DataFrame(data, columns=column_names)
     df["Details"] = df["Details"].replace("", "0")
-    df["Details_Number"] = df["Details"].str.extract(r"(\d+)").fillna(0).astype(int)
+    df["Details_Number"] = (
+        df["Details"].str.extract(r"(\d+)").fillna(0).astype(int)
+    )
     df.drop(columns=["Details"], inplace=True)
 
     return df

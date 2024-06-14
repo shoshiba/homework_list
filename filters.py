@@ -17,9 +17,13 @@ def apply_filters(
 
         # レベル別フィルターの初期化
         st.write("レベル別フィルター")
-        levels = sorted(dfs["me"]["Level"].unique(), key=lambda x: int(x.lstrip("☆")))
+        levels = sorted(
+            dfs["me"]["Level"].unique(), key=lambda x: int(x.lstrip("☆"))
+        )
         if "selected_levels" not in st.session_state:
-            st.session_state.selected_levels = {level: True for level in levels}
+            st.session_state.selected_levels = {
+                level: True for level in levels
+            }
 
         # 譜面難易度別フィルターの初期化
         difficulties = sorted(
@@ -34,7 +38,9 @@ def apply_filters(
         # 順位別フィルターの初期化
         ranks = sorted(comparison["Rank"].unique())
         if "selected_rank" not in st.session_state:
-            st.session_state.selected_rank = {str(rank): True for rank in ranks}
+            st.session_state.selected_rank = {
+                str(rank): True for rank in ranks
+            }
 
         # 全チェック/全解除関数の定義
         def set_all_checkboxes(key: any, items: list, value: str):
@@ -77,7 +83,9 @@ def apply_filters(
                 selected_difficulties.append(difficulty)
 
         # フィルタリング適用
-        comparison = comparison[comparison["Difficulty"].isin(selected_difficulties)]
+        comparison = comparison[
+            comparison["Difficulty"].isin(selected_difficulties)
+        ]
 
         # 順位別フィルター
         st.write("順位別フィルター")

@@ -1,5 +1,6 @@
 [tool.ruff]
 # Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.
+line-length = 79
 select = ["D100","ANN001"]
 ignore = [
     "D203",
