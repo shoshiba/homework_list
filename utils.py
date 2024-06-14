@@ -41,6 +41,7 @@ def create_comparison_dataframe(dfs: list, num_rivals: int):
         "Title": dfs["me"]["Title"],
         "Me": dfs["me"]["Details_Number"],
         "MePer": dfs["me"]["Performance"],
+        "Total_Rank": dfs["me"]["Rank"],
     }
 
     for i in range(1, num_rivals + 1):
@@ -57,13 +58,21 @@ def create_comparison_dataframe(dfs: list, num_rivals: int):
         axis=1,
     )
 
-    comparison["Rank"] = comparison.apply(
+    comparison["Rival_Rank"] = comparison.apply(
         lambda row: calculate_rank(row, num_rivals),
         axis=1,
     )
     comparison["Me_Per"] = comparison["MePer"].apply(extract_percentage)
 
-    columns = ["Level", "Song_Title", "Difficulty", "Rank", "Me", "Me_Per"]
+    columns = [
+        "Level",
+        "Song_Title",
+        "Difficulty",
+        "Me",
+        "Me_Per",
+        "Total_Rank",
+        "Rival_Rank",
+    ]
     columns += [f"Rival{i}" for i in range(1, num_rivals + 1)]
     columns += [f"vsRival{i}" for i in range(1, num_rivals + 1)]
     return comparison[columns]

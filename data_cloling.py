@@ -34,7 +34,7 @@ def crawl_iidx_data(iidx_id: str) -> str:
     return data
 
 
-def create_iidx_dataframe(data: list) -> pd.DataTable:
+def create_iidx_dataframe(data: list) -> pd.DataFrame:
     """クローリングされたデータからDatatableを作成して返す"""
     column_names = [
         "Level",
@@ -49,12 +49,14 @@ def create_iidx_dataframe(data: list) -> pd.DataTable:
     df["Details_Number"] = (
         df["Details"].str.extract(r"(\d+)").fillna(0).astype(int)
     )
+    df["Rank"] = df["Rank"].replace("", "99999").astype(int)
+
     df.drop(columns=["Details"], inplace=True)
 
     return df
 
 
-def crawl_and_save_iidx_data(iidx_id: str) -> pd.DataTable:
+def crawl_and_save_iidx_data(iidx_id: str) -> pd.DataFrame:
     """IIDX IDに基づいてデータをクローリングし、Datatableを作成して返す"""
     raw_data = crawl_iidx_data(iidx_id)
     df = create_iidx_dataframe(raw_data)

@@ -10,7 +10,7 @@ DIFFICULTY_ORDER = ["NORMAL", "HYPER", "ANOTHER", "LEGGENDARIA"]
 
 
 def apply_filters(
-    comparison: pd.Dataframe, dfs: pd.DataFrame, num_rivals: int
+    comparison: pd.DataFrame, dfs: pd.DataFrame, num_rivals: int
 ) -> pd.DataFrame:
     with st.sidebar:
         st.header("フィルター設定")
@@ -36,7 +36,7 @@ def apply_filters(
             }
 
         # 順位別フィルターの初期化
-        ranks = sorted(comparison["Rank"].unique())
+        ranks = sorted(comparison["Rival_Rank"].unique())
         if "selected_rank" not in st.session_state:
             st.session_state.selected_rank = {
                 str(rank): True for rank in ranks
@@ -108,7 +108,7 @@ def apply_filters(
                 selected_ranks.append(rank)
 
         # フィルタリング適用
-        comparison = comparison[comparison["Rank"].isin(selected_ranks)]
+        comparison = comparison[comparison["Rival_Rank"].isin(selected_ranks)]
 
         # 未プレイ曲に関する除外
         st.write("未プレイフィルター")
